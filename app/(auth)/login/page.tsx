@@ -9,10 +9,9 @@ export default function LoginPage() {
   const { connect, isConnected, isConnecting, wallet } = useWallet();
   const [error, setError] = useState<string | null>(null);
 
-  
   useEffect(() => {
     if (isConnected && wallet?.smartWallet) {
-      router.replace("/solanapayWidget"); 
+      router.replace("/solanapayWidget");
     }
   }, [isConnected, wallet, router]);
 
@@ -21,12 +20,13 @@ export default function LoginPage() {
     try {
       await connect({ feeMode: "paymaster" });
       toast.success("Wallet connected! 🎉");
-      
     } catch (e: unknown) {
       const err = e as Error;
       const msg = err?.message || "Connection failed";
       setError(msg);
-      toast.error(msg.includes("NotAllowedError") ? "Passkey cancelled" : "Login failed");
+      toast.error(
+        msg.includes("NotAllowedError") ? "Passkey cancelled" : "Login failed"
+      );
     }
   };
 

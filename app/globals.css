@@ -1,12 +1,10 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
-
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
-
 
 .hover-3d {
   position: relative;
@@ -22,5 +20,6 @@
   transition: transform 0.5s ease;
 }
 
-
-.hover-3d div:nth-child(2):hover ~ figure { transform: rotateX(10deg) rotateY(-10deg); }
+.hover-3d div:nth-child(2):hover ~ figure {
+  transform: rotateX(10deg) rotateY(-10deg);
+}

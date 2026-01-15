@@ -5,33 +5,71 @@ import { usePathname, useRouter } from "next/navigation";
 
 const Footer: React.FC = () => {
   const pathname = usePathname();
-  const router = useRouter(); 
-  const [hoveredItem, setHoveredItem] = useState<"home" |  "workspace" | null>(null);
+  const router = useRouter();
+  const [hoveredItem, setHoveredItem] = useState<"home" | "workspace" | null>(
+    null
+  );
 
-  
   const dockItems = [
     {
       id: "home" as const,
       label: "Home",
       path: "/",
       icon: (
-        <svg className="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <svg
+          className="size-[1.2em]"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+        >
           <g fill="currentColor" strokeLinejoin="miter" strokeLinecap="butt">
-            <polyline points="1 11 12 2 23 11" fill="none" stroke="currentColor" strokeMiterlimit="10" strokeWidth="2" />
-            <path d="m5,13v7c0,1.105.895,2,2,2h10c1.105,0,2-.895,2-2v-7" fill="none" stroke="currentColor" strokeLinecap="square" strokeMiterlimit="10" strokeWidth="2" />
-            <line x1="12" y1="22" x2="12" y2="18" fill="none" stroke="currentColor" strokeLinecap="square" strokeMiterlimit="10" strokeWidth="2" />
+            <polyline
+              points="1 11 12 2 23 11"
+              fill="none"
+              stroke="currentColor"
+              strokeMiterlimit="10"
+              strokeWidth="2"
+            />
+            <path
+              d="m5,13v7c0,1.105.895,2,2,2h10c1.105,0,2-.895,2-2v-7"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="square"
+              strokeMiterlimit="10"
+              strokeWidth="2"
+            />
+            <line
+              x1="12"
+              y1="22"
+              x2="12"
+              y2="18"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="square"
+              strokeMiterlimit="10"
+              strokeWidth="2"
+            />
           </g>
         </svg>
       ),
     },
-    
+
     {
       id: "solanapayWidget" as const,
       label: "solanapayWidget",
       path: "/solanapayWidget",
       icon: (
-        <svg className="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-          <g fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+          className="size-[1.2em]"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+        >
+          <g
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
             <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
           </g>
@@ -45,12 +83,12 @@ const Footer: React.FC = () => {
     return pathname?.startsWith(path);
   };
 
-  
   const handleNavClick = (path: string) => {
     router.push(path);
   };
 
-  const dockSizeClass = "w-[18rem] sm:w-[20rem] md:w-[22rem] lg:w-[24rem] xl:w-[26rem]";
+  const dockSizeClass =
+    "w-[18rem] sm:w-[20rem] md:w-[22rem] lg:w-[24rem] xl:w-[26rem]";
 
   return (
     <footer className="fixed bottom-6 left-1/2 z-40 w-screen -translate-x-1/2">
@@ -75,8 +113,8 @@ const Footer: React.FC = () => {
               >
                 <div
                   className={`relative flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 ${
-                    isItemActive 
-                      ? "bg-slate-100/10 text-white shadow-[0_0_15px_rgba(255,255,255,0.2)]" 
+                    isItemActive
+                      ? "bg-slate-100/10 text-white shadow-[0_0_15px_rgba(255,255,255,0.2)]"
                       : "text-slate-400 hover:text-slate-200"
                   }`}
                 >
@@ -85,7 +123,9 @@ const Footer: React.FC = () => {
 
                 <span
                   className={`absolute -bottom-7 text-[9px] font-bold uppercase tracking-[0.15em] transition-all duration-200 ${
-                    isItemActive || isItemHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+                    isItemActive || isItemHovered
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-2"
                   }`}
                 >
                   {item.label}

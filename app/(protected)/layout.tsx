@@ -25,7 +25,6 @@ export default function ProtectedLayout({
     }
   }, [isConnected, wallet, isConnecting, router, pathname]);
 
-  
   if (!ready) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white">

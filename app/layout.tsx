@@ -39,20 +39,15 @@ export default function RootLayout({
           overflow-hidden
         `}
       >
-        
-        
-          <header className="sticky top-0 z-50">
-            <Navbar />
-          </header>
+        <header className="sticky top-0 z-50">
+          <Navbar />
+        </header>
 
-          <main className="overflow-y-auto">
-            {children}
-          </main>
+        <main className="overflow-y-auto">{children}</main>
 
-          <footer className="sticky bottom-0 z-50">
-            <Footer />
-          </footer>
-        
+        <footer className="sticky bottom-0 z-50">
+          <Footer />
+        </footer>
       </body>
     </html>
   );

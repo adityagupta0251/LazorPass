@@ -7,13 +7,13 @@ import { Wallet, Check, AlertCircle, Loader2, ExternalLink, ArrowRight, QrCode, 
 import { useWallet } from '@lazorkit/wallet';
 
 
-import { 
-  Connection, 
-  PublicKey, 
+import {
+  Connection,
+  PublicKey,
   LAMPORTS_PER_SOL,
   SystemProgram,
 } from "@solana/web3.js";
-import { 
+import {
   getAssociatedTokenAddressSync,
   createTransferInstruction,
   TOKEN_PROGRAM_ID,
@@ -23,24 +23,25 @@ import {
 import { encodeURL, createQR } from '@solana-commerce/solana-pay';
 
 
-const USDC_MINT_DEVNET = new PublicKey("4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU");
+const USDC_MINT_DEVNET = new PublicKey(
+  process.env.NEXT_PUBLIC_USDC_MINT || '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU'
 const RPC_ENDPOINT = 'https://api.devnet.solana.com';
 
 type PaymentStatus = 'idle' | 'processing' | 'success' | 'error';
 type TokenType = 'SOL' | 'USDC';
 
 const SolanaPayWidget = () => {
-  
-  const { 
-    isConnected, 
-    isConnecting, 
-    connect, 
-    disconnect, 
-    smartWalletPubkey, 
-    signAndSendTransaction 
+
+  const {
+    isConnected,
+    isConnecting,
+    connect,
+    disconnect,
+    smartWalletPubkey,
+    signAndSendTransaction
   } = useWallet();
-  
- 
+
+
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>('idle');
   const [signature, setSignature] = useState<string>('');
   const [amount, setAmount] = useState<string>('0.1');
@@ -56,7 +57,7 @@ const SolanaPayWidget = () => {
 
   const connection = useMemo(() => new Connection(RPC_ENDPOINT, 'confirmed'), []);
 
-  
+
   useEffect(() => {
     const validateAddress = () => {
       try {
@@ -64,7 +65,7 @@ const SolanaPayWidget = () => {
           setIsValidRecipient(false);
           return;
         }
-        
+
         const pubkey = new PublicKey(recipientAddress.trim());
         setIsValidRecipient(PublicKey.isOnCurve(pubkey.toBytes()));
       } catch {
@@ -86,10 +87,10 @@ const SolanaPayWidget = () => {
       try {
         const recipient = new PublicKey(recipientAddress.trim());
         const amountNum = parseFloat(amount);
-        
+
         if (isNaN(amountNum) || amountNum <= 0) return;
 
-        
+
         const url = encodeURL({
           recipient: recipient,
           amount: BigInt(Math.floor(amountNum * LAMPORTS_PER_SOL)),
@@ -98,14 +99,14 @@ const SolanaPayWidget = () => {
           memo: `Payment via LazorKit Wallet - ${new Date().toISOString()}`,
         });
 
-        
+
         const qrSvg = await createQR(
           url.toString(),
-          200, 
-          '#0f172a', 
-          '#cbd5e1' 
+          200,
+          '#0f172a',
+          '#cbd5e1'
         );
-        
+
         setQrCode(qrSvg);
       } catch (error) {
         console.error('Error generating QR code:', error);
@@ -116,20 +117,20 @@ const SolanaPayWidget = () => {
     generateQrCode();
   }, [recipientAddress, amount, selectedToken, isValidRecipient]);
 
-  
+
   useEffect(() => {
     const fetchBalances = async () => {
       if (!isConnected || !smartWalletPubkey) return;
-      
+
       try {
-        
+
         const sol = await connection.getBalance(smartWalletPubkey);
         setSolBalance(sol / LAMPORTS_PER_SOL);
 
-        
+
         try {
           const usdcATA = getAssociatedTokenAddressSync(
-            USDC_MINT_DEVNET, 
+            USDC_MINT_DEVNET,
             smartWalletPubkey,
             true,
             TOKEN_PROGRAM_ID,
@@ -138,7 +139,7 @@ const SolanaPayWidget = () => {
           const info = await connection.getTokenAccountBalance(usdcATA);
           setUsdcBalance(info.value.uiAmount || 0);
         } catch (e) {
-          setUsdcBalance(0); 
+          setUsdcBalance(0);
         }
       } catch (error) {
         console.error("Balance fetch error:", error);
@@ -150,7 +151,7 @@ const SolanaPayWidget = () => {
     return () => clearInterval(interval);
   }, [isConnected, smartWalletPubkey, connection]);
 
-  
+
   const handlePayment = useCallback(async () => {
     if (!isConnected || !smartWalletPubkey) {
       setErrorMessage('Please connect your wallet first');
@@ -164,14 +165,14 @@ const SolanaPayWidget = () => {
 
     setPaymentStatus('processing');
     setErrorMessage('');
-    
+
     try {
       const amountNum = parseFloat(amount);
       if (isNaN(amountNum) || amountNum <= 0) throw new Error('Invalid amount');
 
       const recipient = new PublicKey(recipientAddress.trim());
       let instruction;
-      
+
       if (selectedToken === 'SOL') {
         const lamports = Math.floor(amountNum * LAMPORTS_PER_SOL);
         if (lamports > solBalance * LAMPORTS_PER_SOL) throw new Error('Insufficient SOL');
@@ -199,17 +200,17 @@ const SolanaPayWidget = () => {
         );
       }
 
-      
+
       const result = await signAndSendTransaction({
         instructions: [instruction],
       });
 
       if (result) {
-        setSignature(result); 
+        setSignature(result);
         setPaymentStatus('success');
       }
 
-    
+
     } catch (error: any) {
       console.error("Payment failed:", error);
       setPaymentStatus('error');
@@ -217,7 +218,7 @@ const SolanaPayWidget = () => {
     }
   }, [isConnected, smartWalletPubkey, amount, selectedToken, solBalance, usdcBalance, recipientAddress, isValidRecipient, signAndSendTransaction]);
 
-  
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     setIsCopied(true);
@@ -225,7 +226,7 @@ const SolanaPayWidget = () => {
   };
 
 
-  const displayAddress = smartWalletPubkey 
+  const displayAddress = smartWalletPubkey
     ? `${smartWalletPubkey.toBase58().slice(0, 4)}...${smartWalletPubkey.toBase58().slice(-4)}`
     : "";
 
@@ -243,7 +244,7 @@ const SolanaPayWidget = () => {
     if (!isConnected || !isValidAmount || paymentStatus === 'processing' || !isValidRecipient) return false;
     const amountNum = parseFloat(amount);
     if (selectedToken === 'SOL') {
-      return amountNum <= solBalance - 0.001; 
+      return amountNum <= solBalance - 0.001;
     }
     return amountNum <= usdcBalance;
   }, [isConnected, isValidAmount, paymentStatus, amount, selectedToken, solBalance, usdcBalance, isValidRecipient]);
@@ -252,15 +253,15 @@ const SolanaPayWidget = () => {
     <div className="min-h-screen bg-linear-to-br from-slate-950 via-purple-950 to-slate-950 flex items-center justify-center p-4 sm:p-6">
       <div className="w-full max-w-6xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          
-          
+
+
           <div className="bg-slate-900/95 backdrop-blur-sm rounded-2xl border border-slate-700/70 p-6 sm:p-8 flex flex-col">
             <div className="flex items-center gap-3 mb-8">
               <div className="bg-linear-to-br from-purple-500 to-blue-600 p-3 rounded-xl">
                 <svg className="w-8 h-8 sm:w-10 sm:h-10 text-white" viewBox="0 0 397.7 311.7" fill="currentColor">
-                  <path d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1l62.7-62.7z"/>
-                  <path d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1L64.6 3.8z"/>
-                  <path d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6-11.1l-62.7-62.7z"/>
+                  <path d="M64.6 237.9c2.4-2.4 5.7-3.8 9.2-3.8h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1l62.7-62.7z" />
+                  <path d="M64.6 3.8C67.1 1.4 70.4 0 73.8 0h317.4c5.8 0 8.7 7 4.6 11.1l-62.7 62.7c-2.4 2.4-5.7 3.8-9.2 3.8H6.5c-5.8 0-8.7-7-4.6-11.1L64.6 3.8z" />
+                  <path d="M333.1 120.1c-2.4-2.4-5.7-3.8-9.2-3.8H6.5c-5.8 0-8.7 7-4.6 11.1l62.7 62.7c2.4 2.4 5.7 3.8 9.2 3.8h317.4c5.8 0 8.7-7 4.6-11.1l-62.7-62.7z" />
                 </svg>
               </div>
               <div>
@@ -288,7 +289,7 @@ const SolanaPayWidget = () => {
                 </div>
               </div>
 
-             
+
               {qrCode && (
                 <div className="border-t border-slate-700/70 pt-6">
                   <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
@@ -296,7 +297,7 @@ const SolanaPayWidget = () => {
                     Scan QR Code
                   </h3>
                   <div className="bg-black/40 rounded-lg p-4 border border-slate-700/30 flex flex-col items-center">
-                    <div 
+                    <div
                       className="qr-code-container bg-white p-2 rounded-lg mb-3"
                       dangerouslySetInnerHTML={{ __html: qrCode }}
                     />
@@ -315,7 +316,7 @@ const SolanaPayWidget = () => {
             </div>
           </div>
 
-         
+
           <div className="bg-slate-900/95 backdrop-blur-sm rounded-2xl border border-slate-700/70 p-6 sm:p-8">
             <div className="space-y-6">
               <div>
@@ -331,8 +332,8 @@ const SolanaPayWidget = () => {
                     <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
                     <span className="text-emerald-300 font-mono text-sm">{displayAddress}</span>
                   </div>
-                  <button 
-                    onClick={disconnect} 
+                  <button
+                    onClick={disconnect}
                     className="text-slate-400 hover:text-white text-xs transition-colors px-3 py-1 rounded hover:bg-slate-700/50"
                   >
                     Disconnect
@@ -341,7 +342,7 @@ const SolanaPayWidget = () => {
               )}
 
               <div className="space-y-4">
-              
+
                 <div>
                   <label className="text-slate-400 text-sm mb-2 block items-center gap-2">
                     <User className="w-3 h-3" />
@@ -375,7 +376,7 @@ const SolanaPayWidget = () => {
                   )}
                 </div>
 
-               
+
                 <div>
                   <label className="text-slate-400 text-sm mb-2 block">Amount</label>
                   <input
@@ -393,7 +394,7 @@ const SolanaPayWidget = () => {
                   )}
                 </div>
 
-               
+
                 <div>
                   <label className="text-slate-400 text-sm mb-2 block">Select Token</label>
                   <div className="grid grid-cols-2 gap-3">
@@ -401,11 +402,10 @@ const SolanaPayWidget = () => {
                       type="button"
                       onClick={() => setSelectedToken('SOL')}
                       disabled={paymentStatus === 'processing'}
-                      className={`p-3 rounded-xl border font-medium transition-all ${
-                        selectedToken === 'SOL' 
-                          ? 'border-emerald-400 bg-emerald-500/10 text-emerald-300 shadow-lg shadow-emerald-500/20' 
+                      className={`p-3 rounded-xl border font-medium transition-all ${selectedToken === 'SOL'
+                          ? 'border-emerald-400 bg-emerald-500/10 text-emerald-300 shadow-lg shadow-emerald-500/20'
                           : 'border-slate-700 text-slate-300 hover:border-slate-600 hover:bg-slate-800/50'
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center justify-center gap-2">
                         <span>◎</span>
@@ -416,11 +416,10 @@ const SolanaPayWidget = () => {
                       type="button"
                       onClick={() => setSelectedToken('USDC')}
                       disabled={paymentStatus === 'processing'}
-                      className={`p-3 rounded-xl border font-medium transition-all ${
-                        selectedToken === 'USDC' 
-                          ? 'border-blue-400 bg-blue-500/10 text-blue-300 shadow-lg shadow-blue-500/20' 
+                      className={`p-3 rounded-xl border font-medium transition-all ${selectedToken === 'USDC'
+                          ? 'border-blue-400 bg-blue-500/10 text-blue-300 shadow-lg shadow-blue-500/20'
                           : 'border-slate-700 text-slate-300 hover:border-slate-600 hover:bg-slate-800/50'
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center justify-center gap-2">
                         <span>$</span>
@@ -430,7 +429,7 @@ const SolanaPayWidget = () => {
                   </div>
                 </div>
 
-                
+
                 <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700/70 space-y-2">
                   <div className="flex justify-between text-xs text-slate-400">
                     <span>Amount</span>
@@ -448,7 +447,7 @@ const SolanaPayWidget = () => {
                   </div>
                 </div>
 
-                
+
                 {!isConnected ? (
                   <button
                     type="button"
@@ -473,11 +472,10 @@ const SolanaPayWidget = () => {
                     type="button"
                     onClick={handlePayment}
                     disabled={!canPay || paymentStatus === 'processing'}
-                    className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-3 transition-all shadow-lg ${
-                      canPay && paymentStatus === 'idle'
+                    className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-3 transition-all shadow-lg ${canPay && paymentStatus === 'idle'
                         ? 'bg-linear-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 text-white shadow-emerald-500/25 hover:shadow-emerald-400/50'
                         : 'bg-slate-800/50 text-slate-400 cursor-not-allowed'
-                    }`}
+                      }`}
                   >
                     {paymentStatus === 'processing' ? (
                       <>
@@ -494,7 +492,7 @@ const SolanaPayWidget = () => {
                   </button>
                 )}
 
-                
+
                 {paymentStatus === 'success' && signature && (
                   <div className="bg-emerald-500/15 border border-emerald-500/40 rounded-xl p-6 text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <div className="flex justify-center mb-4">
@@ -506,9 +504,9 @@ const SolanaPayWidget = () => {
                     <p className="text-emerald-400/80 text-sm mb-4">
                       Sent {amount} {selectedToken} to {recipientAddress.slice(0, 8)}...{recipientAddress.slice(-4)}
                     </p>
-                    <a 
-                      href={`https://explorer.solana.com/tx/${signature}?cluster=devnet`} 
-                      target="_blank" 
+                    <a
+                      href={`https://explorer.solana.com/tx/${signature}?cluster=devnet`}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 text-emerald-300 hover:text-emerald-200 font-medium text-sm underline transition-colors"
                     >
@@ -517,7 +515,7 @@ const SolanaPayWidget = () => {
                   </div>
                 )}
 
-                
+
                 {paymentStatus === 'error' && (
                   <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-start gap-3 text-red-400 animate-in fade-in slide-in-from-bottom-4 duration-300">
                     <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
