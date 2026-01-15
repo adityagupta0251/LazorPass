@@ -320,12 +320,12 @@ By exploring this codebase, you'll understand:
 
 For detailed implementation guides, check out these tutorials:
 
-1. **[Tutorial 1: Creating a Passkey-Based Wallet](./TUTORIAL_PASSKEY.md)**
+1. **[Tutorial 1: Creating a Passkey-Based Wallet](./Tutorial1.md)**
    - Setting up authentication flow
    - Understanding WebAuthn integration
    - Handling wallet connection states
 
-2. **[Tutorial 2: Building a Gasless Payment Widget](./TUTORIAL_PAYMENT.md)**
+2. **[Tutorial 2: Building a Gasless Payment Widget](./Tutorial2.md)**
    - Creating Solana transactions
    - Implementing gasless transfers
    - Adding USDC support
