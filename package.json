@@ -9,7 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@chakra-ui/react": "^3.31.0",
     "@coral-xyz/anchor": "^0.32.1",
     "@emotion/react": "^11.14.0",
     "@heroui/react": "^2.8.7",
