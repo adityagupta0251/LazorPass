@@ -6,9 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 const Footer: React.FC = () => {
   const pathname = usePathname();
   const router = useRouter();
-  const [hoveredItem, setHoveredItem] = useState<"home" | "workspace" | null>(
-    null
-  );
+  const [hoveredItem, setHoveredItem] = useState<"home" | "solanapayWidget" | null>(null);
 
   const dockItems = [
     {
@@ -106,27 +104,24 @@ const Footer: React.FC = () => {
                 onClick={() => handleNavClick(item.path)}
                 onMouseEnter={() => setHoveredItem(item.id)}
                 onMouseLeave={() => setHoveredItem(null)}
-                className={`group relative flex h-full flex-col items-center justify-center gap-1 transition-all duration-200 ${
-                  isItemActive ? "scale-[1.1]" : "hover:scale-[1.05]"
-                }`}
+                className={`group relative flex h-full flex-col items-center justify-center gap-1 transition-all duration-200 ${isItemActive ? "scale-[1.1]" : "hover:scale-[1.05]"
+                  }`}
                 aria-label={item.label}
               >
                 <div
-                  className={`relative flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 ${
-                    isItemActive
+                  className={`relative flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-200 ${isItemActive
                       ? "bg-slate-100/10 text-white shadow-[0_0_15px_rgba(255,255,255,0.2)]"
                       : "text-slate-400 hover:text-slate-200"
-                  }`}
+                    }`}
                 >
                   {item.icon}
                 </div>
 
                 <span
-                  className={`absolute -bottom-7 text-[9px] font-bold uppercase tracking-[0.15em] transition-all duration-200 ${
-                    isItemActive || isItemHovered
+                  className={`absolute -bottom-7 text-[9px] font-bold uppercase tracking-[0.15em] transition-all duration-200 ${isItemActive || isItemHovered
                       ? "opacity-100 translate-y-0"
                       : "opacity-0 translate-y-2"
-                  }`}
+                    }`}
                 >
                   {item.label}
                 </span>

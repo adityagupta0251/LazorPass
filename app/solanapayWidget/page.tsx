@@ -107,7 +107,8 @@ const SolanaPayWidget = () => {
         if (isNaN(amountNum) || amountNum <= 0) return;
 
         const url = encodeURL({
-          recipient: recipient,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          recipient: recipient as any,
           amount: BigInt(Math.floor(amountNum * LAMPORTS_PER_SOL)),
           label: "Solana Payment",
           message: `Payment of ${amount} ${selectedToken}`,
@@ -523,7 +524,7 @@ const SolanaPayWidget = () => {
                 {!isConnected ? (
                   <button
                     type="button"
-                    onClick={connect}
+                    onClick={() => connect({ feeMode: "paymaster" })}
                     disabled={isConnecting}
                     className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-3 transition-all shadow-lg bg-linear-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white shadow-purple-500/25`}
                   >
