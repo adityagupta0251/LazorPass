@@ -1,26 +1,26 @@
 @import "tailwindcss";
+@plugin "daisyui";
+
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+.hover-3d {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  perspective: 1000px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.hover-3d figure {
+  grid-column: 1 / span 3;
+  grid-row: 1 / span 3;
+  transition: transform 0.5s ease;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+
+.hover-3d div:nth-child(2):hover ~ figure { transform: rotateX(10deg) rotateY(-10deg); }
